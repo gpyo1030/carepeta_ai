@@ -1,14 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
-    const adviceContent = document.getElementById('advice-content');
     const careForm = document.getElementById('care-form');
     const userInput = document.getElementById('user-input');
     const aiAdvice = document.getElementById('ai-advice');
     const loadingSpinner = document.getElementById('loading-spinner');
-
-    const API_KEY = 'YOUR_API_KEY'; // Replace with your actual API key
-    const genAI = new window.generativeAI.GoogleGenerativeAI(API_KEY);
 
     let selectedCompanion = 'Cat'; // Default selection
 
@@ -57,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     careForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
         const userQuery = userInput.value;
 
         if (!userQuery) {
@@ -68,12 +65,23 @@ document.addEventListener('DOMContentLoaded', () => {
         aiAdvice.innerHTML = '';
 
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-            const prompt = `Provide care advice for a ${selectedCompanion}. The user says: "${userQuery}". Provide a detailed, helpful response.`;
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = await response.text();
-            aiAdvice.innerHTML = `<p>${text}</p>`;
+            const fullPrompt = `Provide care advice for a ${selectedCompanion}. The user says: "${userQuery}". Provide a detailed, helpful response.`;
+
+            const serverResponse = await fetch('http://localhost:3000/api/get-advice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: fullPrompt }),
+            });
+
+            if (!serverResponse.ok) {
+                throw new Error(`Server error: ${serverResponse.statusText}`);
+            }
+
+            const data = await serverResponse.json();
+            aiAdvice.innerHTML = `<p>${data.advice}</p>`;
+
         } catch (error) {
             console.error(error);
             aiAdvice.innerHTML = '<p>Sorry, I could not get advice at this time. Please try again later.</p>';
@@ -81,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingSpinner.style.display = 'none';
         }
     });
-
 
     renderCards('pets', petData);
     renderCards('plants', plantData);
