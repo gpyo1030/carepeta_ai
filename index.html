@@ -1,14 +1,44 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pet & Plant Care</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <header>
+        <h1>AI Pet & Plant Care</h1>
+        <p>Your AI-powered companion for happy pets and thriving plants.</p>
+    </header>
+
+    <main>
+        <section id="selection">
+            <h2>Select Your Companion</h2>
+            <div class="tabs">
+                <button class="tab-link active" data-tab="pets">Pets</button>
+                <button class="tab-link" data-tab="plants">Plants</button>
+            </div>
+
+            <div id="pets" class="tab-content active">
+                <div class="card-container">
+                    </div>
+            </div>
+
+            <div id="plants" class="tab-content">
+                <div class="card-container">
+                    </div>
+            </div>
+        </section>
+
+        <section id="advice">
+            <h2>Care Advice</h2>
+            <div id="advice-content">
+                <p>Select a pet or plant to get started.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="main.js"></script>
 </body>
 </html>
