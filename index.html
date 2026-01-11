@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Pet & Plant Care</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="about" href="GEMINI.md">
 </head>
 <body>
     <header>
@@ -31,14 +32,23 @@
             </div>
         </section>
 
-        <section id="advice">
-            <h2>Care Advice</h2>
-            <div id="advice-content">
-                <p>Select a pet or plant to get started.</p>
+        <section id="ai-care">
+            <h2>AI Care Assistant</h2>
+            <form id="care-form">
+                <label for="user-input">Describe your pet or plant:</label>
+                <textarea id="user-input" name="user-input" rows="4" placeholder="e.g., My golden retriever is 3 years old and has been shedding a lot lately."></textarea>
+                <button type="submit">Get AI Advice</button>
+            </form>
+            <div id="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+            <div id="ai-advice">
+                
             </div>
         </section>
     </main>
 
+    <script type="module" src="https://esm.run/@google/generative-ai"></script>
     <script src="main.js"></script>
 </body>
 </html>

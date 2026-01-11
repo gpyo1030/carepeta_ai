@@ -2,18 +2,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
     const adviceContent = document.getElementById('advice-content');
+    const careForm = document.getElementById('care-form');
+    const userInput = document.getElementById('user-input');
+    const aiAdvice = document.getElementById('ai-advice');
+    const loadingSpinner = document.getElementById('loading-spinner');
+
+    const API_KEY = 'YOUR_API_KEY'; // Replace with your actual API key
+    const genAI = new window.generativeAI.GoogleGenerativeAI(API_KEY);
+
+    let selectedCompanion = 'Cat'; // Default selection
 
     const petData = [
-        { name: 'Cat', image: 'https://placekitten.com/200/150', advice: 'Cats need a balanced diet, regular play, and a clean litter box.' },
-        { name: 'Dog', image: 'https://placedog.net/200/150', advice: 'Dogs require daily walks, training, and social interaction.' },
-        { name: 'Rabbit', image: 'https://place-rabbit.com/200/150', advice: 'Rabbits need a diet of hay, fresh vegetables, and a spacious hutch.' },
-        
+        { name: 'Cat', image: 'https://placekitten.com/200/150' },
+        { name: 'Dog', image: 'https://placedog.net/200/150' },
+        { name: 'Rabbit', image: 'https://place-rabbit.com/200/150' },
     ];
 
     const plantData = [
-        { name: 'Succulent', image: 'https://images.unsplash.com/photo-1593971485387-133a8a5b4b1f?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=200', advice: 'Succulents thrive in bright, indirect light and need infrequent watering.' },
-        { name: 'Fern', image: 'https://images.unsplash.com/photo-1601326284993-4174b8a1c9a2?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=200', advice: 'Ferns prefer humid environments and consistently moist soil.' },
-        { name: 'Orchid', image: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=200', advice: 'Orchids need specialized care, including specific potting mix and careful watering.' },
+        { name: 'Succulent', image: 'https://images.unsplash.com/photo-1593971485387-133a8a5b4b1f?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=200' },
+        { name: 'Fern', image: 'https://images.unsplash.com/photo-1601326284993-4174b8a1c9a2?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=200' },
+        { name: 'Orchid', image: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=200' },
     ];
 
     function renderCards(containerId, data) {
@@ -27,7 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>${item.name}</h3>
             `;
             card.addEventListener('click', () => {
-                adviceContent.innerHTML = `<p>${item.advice}</p>`;
+                selectedCompanion = item.name;
+                userInput.value = '';
+                aiAdvice.innerHTML = '';
+                document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
             });
             container.appendChild(card);
         });
@@ -42,6 +54,34 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(tab.dataset.tab).classList.add('active');
         });
     });
+
+    careForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userQuery = userInput.value;
+
+        if (!userQuery) {
+            aiAdvice.innerHTML = '<p>Please describe your pet or plant.</p>';
+            return;
+        }
+
+        loadingSpinner.style.display = 'block';
+        aiAdvice.innerHTML = '';
+
+        try {
+            const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+            const prompt = `Provide care advice for a ${selectedCompanion}. The user says: "${userQuery}". Provide a detailed, helpful response.`;
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = await response.text();
+            aiAdvice.innerHTML = `<p>${text}</p>`;
+        } catch (error) {
+            console.error(error);
+            aiAdvice.innerHTML = '<p>Sorry, I could not get advice at this time. Please try again later.</p>';
+        } finally {
+            loadingSpinner.style.display = 'none';
+        }
+    });
+
 
     renderCards('pets', petData);
     renderCards('plants', plantData);
